@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { AdminEntity } from 'src/admin/admin.entity';
 import { Department } from 'src/dept/dept.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -7,6 +7,7 @@ import { EmployeeService } from './employee.service';
 import {getConnectionManager, createConnections} from "typeorm";
 import { GetEmployeesFilterDto } from './dto/get-employees-filter.dto';
 import { UpdateEmployeeNameDto } from './dto/update-employee-data.dto';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 
 const connection = createConnections([{
     name: 'default',
@@ -25,6 +26,12 @@ const connection = createConnections([{
   }]);
 const defaultConnection = getConnectionManager().get('default');
 
+export class getDefaultConnection{
+  async conn(){
+    return defaultConnection
+  }
+};
+
 @Controller('employee')
 export class EmployeeController {
   constructor(private employeeService: EmployeeService) {}
@@ -33,7 +40,7 @@ export class EmployeeController {
   async createEmployee(
     @Body() createEmployeeDto: CreateEmployeeDto
   ): Promise<Employee> {
-    const {name, department_id, adminEntity_id, salary} = createEmployeeDto
+    const {department_id, adminEntity_id, ...rest} = createEmployeeDto
     
     const department = await defaultConnection
         .getRepository(Department)
@@ -46,6 +53,9 @@ export class EmployeeController {
         .where("adminEntity.id = :id", { id: adminEntity_id })
         .getOne();
     console.log(department, adminEntity)
+    if (!department) {
+      throw new NotFoundException("Department not found");
+    }
     return this.employeeService.createEmployee(createEmployeeDto, department, adminEntity);
   }
 
@@ -58,6 +68,11 @@ export class EmployeeController {
   @Get('/:id')
   getEmployeeById(@Param('id') id: number): Promise<Employee> {
       return this.employeeService.getEmployeeById(id);
+  }
+
+  @Get('/name/:name/')
+  getEmployeeByName(@Param('name') name: string): Promise<Employee> {
+    return this.employeeService.getEmployeeByName(name);
   }
 
   @Delete('/:id')
@@ -73,4 +88,5 @@ export class EmployeeController {
       const {name} = updateEmployeeNameDto;
       return this.employeeService.updateEmployeeName(id, name);
   }
+
 }

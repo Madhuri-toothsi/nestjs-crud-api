@@ -6,30 +6,38 @@ import { EntityRepository, Repository } from "typeorm";
 import { CreateEmployeeDto } from "./dto/create-employee.dto";
 import { Employee } from "./employee.entitiy";
 import { GetEmployeesFilterDto } from "./dto/get-employees-filter.dto";
-import { NotFoundException } from "@nestjs/common";
-
 
 @EntityRepository(Employee)
 export class EmployeeRepository extends Repository<Employee> {
 
     async createEmployee(
         createEmployeeDto: CreateEmployeeDto, department: Department, adminEntity: AdminEntity): Promise<Employee> {
-        const {name, salary} = createEmployeeDto;
-
+        const {name, salary, password} = createEmployeeDto;
+        const query = this.createQueryBuilder('employee');
         const employee = this.create({
-            name,
-            salary,
-            department,
-            adminEntity
+          name,
+          salary,
+          department,
+          adminEntity,
+          password
         })
 
         await this.save(employee);
+        delete employee.password;
         return employee;
     }
+
+    async findEmployee(name: string): Promise<Employee> {
+      const query = this.createQueryBuilder('employee');
+      const employee = await query.andWhere('employee.name = :name', {name}).getOne();
+      delete employee.password;
+      return employee;
+    }
+
     async getEmployees(filterDto: GetEmployeesFilterDto): Promise<Employee[]> {
         const { isActive, search } = filterDto;
     
-        const query = this.createQueryBuilder('employee');        
+        const query = this.createQueryBuilder('employee');
 
         if (isActive) {
             query.andWhere('employee.isActive = :isActive', { isActive });

@@ -8,11 +8,17 @@ import { AdminModule } from './admin/admin.module';
 import { Employee } from './employee/employee.entitiy';
 import { Department } from './dept/dept.entity';
 import { AdminEntity } from './admin/admin.entity';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import { EmployeeService } from './employee/employee.service';
+import { EmployeeRepository } from './employee/employee.repository';
 
 @Module({
-  imports: [EmployeeModule,
+  imports: [
+    EmployeeModule,
     DepartmentModule,
     AdminModule,
+    TypeOrmModule.forFeature([EmployeeRepository]),
     TypeOrmModule.forRoot({
       name: 'default',
       type: 'mysql',
@@ -27,9 +33,10 @@ import { AdminEntity } from './admin/admin.entity';
         AdminEntity,
       ],
       synchronize: true,
-    })
+    }),
+    AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthService, EmployeeService],
 })
 export class AppModule {}

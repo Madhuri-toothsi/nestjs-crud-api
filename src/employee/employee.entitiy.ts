@@ -28,4 +28,7 @@ export class Employee {
 
     @Column()
     salary: number;
+
+    @Column()
+    password: string;
 }

@@ -21,9 +21,16 @@ export class EmployeeService {
 
     async getEmployeeById(id:number): Promise<Employee> {
         const found =  await this.employeeRepository.findOne(id);
-
         if(!found) {
             throw new NotFoundException(`Employee with ID "${id}"" not found`)
+        }
+        return found;
+    }
+
+    async getEmployeeByName(name:string): Promise<Employee | undefined> {
+        const found =  await this.employeeRepository.findEmployee(name);
+        if(!found) {
+            throw new NotFoundException(`Employee with name "${name}"" not found`)
         }
         return found;
     }
@@ -34,7 +41,6 @@ export class EmployeeService {
 
     async deleteEmployeeById(id: number): Promise<void> {
         const result = await this.employeeRepository.delete(id);
-
         if (result.affected === 0) {
             throw new NotFoundException(`Task with "${id}" not found `);
         }
