@@ -7,8 +7,6 @@ export class AuthService {
 
     async validateEmployee(name: string, password: string): Promise<any> {
         const user = await this.employeesService.getEmployeeByName(name);
-        console.log(user)
-        console.log("coming from AuthService")
 
         if (user && user.password === password) {
             const {password, ...rest} = user;

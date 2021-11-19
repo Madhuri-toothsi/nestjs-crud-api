@@ -8,6 +8,7 @@ import {getConnectionManager, createConnections} from "typeorm";
 import { GetEmployeesFilterDto } from './dto/get-employees-filter.dto';
 import { UpdateEmployeeNameDto } from './dto/update-employee-data.dto';
 import { LocalAuthGuard } from 'src/auth/local-auth.guard';
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 
 const connection = createConnections([{
     name: 'default',
@@ -59,27 +60,31 @@ export class EmployeeController {
     return this.employeeService.createEmployee(createEmployeeDto, department, adminEntity);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get()
   getEmployees(@Query() filterDto: GetEmployeesFilterDto): Promise<Employee[]> {
       return this.employeeService.getEmployees(filterDto);
   }
 
-
+  @UseGuards(AuthenticatedGuard)
   @Get('/:id')
   getEmployeeById(@Param('id') id: number): Promise<Employee> {
       return this.employeeService.getEmployeeById(id);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('/name/:name/')
   getEmployeeByName(@Param('name') name: string): Promise<Employee> {
     return this.employeeService.getEmployeeByName(name);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Delete('/:id')
   deleteEmployeeById(@Param('id') id: number): Promise<void>{
       return this.employeeService.deleteEmployeeById(id);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Patch('/:id')
   updateEmployeeName(
       @Param('id') id: number,

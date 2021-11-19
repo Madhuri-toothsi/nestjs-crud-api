@@ -6,9 +6,10 @@ import { EmployeeRepository } from 'src/employee/employee.repository';
 import { EmployeeService } from 'src/employee/employee.service';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
+import { SessionSerializer } from './session.serializer';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EmployeeRepository]), EmployeeModule, PassportModule],
-    providers: [AuthService, EmployeeService, LocalStrategy],
+    imports: [TypeOrmModule.forFeature([EmployeeRepository]), EmployeeModule, PassportModule.register({session:true})],
+    providers: [AuthService, EmployeeService, LocalStrategy, SessionSerializer],
 })
 export class AuthModule {}

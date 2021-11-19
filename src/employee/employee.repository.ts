@@ -30,7 +30,6 @@ export class EmployeeRepository extends Repository<Employee> {
     async findEmployee(name: string): Promise<Employee> {
       const query = this.createQueryBuilder('employee');
       const employee = await query.andWhere('employee.name = :name', {name}).getOne();
-      delete employee.password;
       return employee;
     }
 
